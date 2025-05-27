@@ -31,6 +31,7 @@ class MusicController extends Controller
     #[Route('/player/{music}', 'GET', 'music.player')]
     public function player(Request $request, ?string $music = null): Response
     {
+        return new Response(t('Bem-vindo'));
         $mimeType = $this->musicService->get($music, true);
         return $this->view('music.player', compact('request', 'music', 'mimeType'));
     }

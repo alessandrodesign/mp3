@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use App\Middlewares\LocaleMiddleware;
 use App\Middlewares\ResponseCacheMiddleware;
 use Core\Routing\Router;
 use Core\Utils\ClassFinder;
@@ -24,6 +25,7 @@ class App
 
     /**
      * Construtor privado para evitar instância direta.
+     * @throws Exception
      */
     private function __construct()
     {
@@ -78,7 +80,9 @@ class App
         // Registrar Request
         $this->container->addDefinitions([
             Request::class => \DI\factory(function () {
-                return Request::createFromGlobals();
+                $request = Request::createFromGlobals();
+                $request->setLocale(DEFAULT_LOCALE);
+                return $request;
             })
         ]);
 
@@ -155,11 +159,35 @@ class App
         $router->registerControllers($controllerClasses);
 
         // Registrar middlewares globais
-         $router->registerGlobalMiddlewares([
-             ResponseCacheMiddleware::class,
-         ]);
+        $router->registerGlobalMiddlewares([
+            ResponseCacheMiddleware::class,
+            LocaleMiddleware::class,
+        ]);
+
+        $this->loadHelpers();
 
         $response = $router->dispatch($request);
         $response->send();
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function loadHelpers(): void
+    {
+        $helpersPath = PATH_HELPERS;
+        $files = Directories::findFiles($helpersPath);
+
+        if (empty($files)) {
+            return;
+        }
+
+        global $container;
+         $container= $this->container->build();
+
+        foreach ($files as $file) {
+            if (!file_exists($file)) continue;
+            include_once $file;
+        }
     }
 }

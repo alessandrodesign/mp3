@@ -33,6 +33,7 @@ class Bootstrap
 
     /**
      * Construtor privado para evitar instância direta.
+     * @throws Exception
      */
     private function __construct()
     {
@@ -117,6 +118,8 @@ class Bootstrap
             'PATH_ROOT' => $this->basePath,
             'PATH_PUBLIC' => $this->basePath . 'public' . DIRECTORY_SEPARATOR,
             'PATH_STORAGE' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR,
+            'PATH_TRANSLATIONS' => $this->basePath . 'translations' . DIRECTORY_SEPARATOR,
+            'PATH_HELPERS' => $this->basePath . 'helpers' . DIRECTORY_SEPARATOR,
             'PATH_MUSIC' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'music' . DIRECTORY_SEPARATOR,
             'PATH_CACHE' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR,
             'PATH_LOG' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR,
@@ -193,7 +196,7 @@ class Bootstrap
             }
         }
 
-        if(defined('SECRET_KEY')){
+        if (defined('SECRET_KEY')) {
             define('SECRET_KEY_GLOBAL', hex2bin(SECRET_KEY));
         }
     }

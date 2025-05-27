@@ -284,15 +284,31 @@
             });
         }
 
+        let interval;
+        let position = 0;
+
         // Play ou pause
         function togglePlay() {
             if (isPlaying) {
                 document.title = `Pause: ${title.textContent}`;
+                stopTitleMarquee();
                 audio.pause();
             } else {
-                document.title = `Reproduzindo: ${title.textContent}`;
+                document.title = `🎵 Reproduzindo: ${title.textContent}`;
+                startTitleMarquee();
                 audio.play();
             }
+        }
+
+        function startTitleMarquee() {
+            interval = setInterval(() => {
+                document.title = baseTitle.substring(position) + " " + baseTitle.substring(0, position);
+                position = (position + 1) % baseTitle.length;
+            }, 300);
+        }
+
+        function stopTitleMarquee() {
+            clearInterval(interval);
         }
 
         // Função para iniciar o crossfade
