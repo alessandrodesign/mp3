@@ -4,6 +4,7 @@ namespace App\Services;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\MimeTypes;
 
 class AudioStreamService
 {
@@ -56,8 +57,11 @@ class AudioStreamService
             fclose($handle);
         }, $status);
 
+        $mimeTypes = MimeTypes::getDefault();
+        $contentType = $mimeTypes->guessMimeType($filePath) ?: 'audio/*';
+
         $headers = [
-            'Content-Type' => mime_content_type($filePath),
+            'Content-Type' => $contentType,
             'Accept-Ranges' => 'bytes',
             'Content-Length' => $length,
             'Cache-Control' => 'public, max-age=86400',
