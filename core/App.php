@@ -2,6 +2,7 @@
 
 namespace Core;
 
+use App\Middlewares\ResponseCacheMiddleware;
 use Core\Routing\Router;
 use Core\Utils\ClassFinder;
 use Core\Utils\Directories;
@@ -81,6 +82,11 @@ class App
             })
         ]);
 
+        // Registrar Providers automaticamente
+        $providersDir = PATH_PROVIDERS;
+        Directories::validAndCreate($providersDir);
+        $this->registerAutomaticallyDefinitios($providersDir);
+
         // Registrar Models automaticamente
         $modelsDir = PATH_MODElS;
         Directories::validAndCreate($modelsDir);
@@ -113,6 +119,16 @@ class App
         }
     }
 
+    private function registerAutomaticallyDefinitios(string $directory): void
+    {
+        $files = Directories::findFiles($directory);
+        if (!empty($files)) {
+            foreach ($files as $file) {
+                $this->container->addDefinitions($file);
+            }
+        }
+    }
+
     public function getId(string $class): string
     {
         $class = trim($class);
@@ -138,10 +154,10 @@ class App
         // Registra todos os controllers encontrados
         $router->registerControllers($controllerClasses);
 
-        // Registrar middlewares globais, se houver
-        // $router->registerGlobalMiddlewares([
-        //     Middleware\SomeGlobalMiddleware::class,
-        // ]);
+        // Registrar middlewares globais
+         $router->registerGlobalMiddlewares([
+             ResponseCacheMiddleware::class,
+         ]);
 
         $response = $router->dispatch($request);
         $response->send();

@@ -287,8 +287,10 @@
         // Play ou pause
         function togglePlay() {
             if (isPlaying) {
+                document.title = `Pause: ${title.textContent}`;
                 audio.pause();
             } else {
+                document.title = `Reproduzindo: ${title.textContent}`;
                 audio.play();
             }
         }

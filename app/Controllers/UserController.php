@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use Core\Routing\Route;
 use Core\Routing\Middleware;
-use Middleware\AuthMiddleware;
+use App\Middlewares\AuthMiddleware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 

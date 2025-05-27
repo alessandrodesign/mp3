@@ -2,6 +2,9 @@
 
 namespace Core\Utils;
 
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use RuntimeException;
 
 class Directories
@@ -22,9 +25,24 @@ class Directories
         }
     }
 
-    public static function listClasses(string $dir,string $namespace): array
+    public static function listClasses(string $dir, string $namespace): array
     {
         Directories::validAndCreate($dir);
         return ClassFinder::findConcreteClasses($dir, $namespace);
+    }
+
+    public static function findFiles(string $dir): array
+    {
+        $files = [];
+
+        $dirIterator = new RecursiveDirectoryIterator($dir);
+        $iterator = new RecursiveIteratorIterator($dirIterator);
+        $regex = new RegexIterator($iterator, '/^.+\.php$/i', RegexIterator::GET_MATCH);
+
+        foreach ($regex as $list) {
+            $files = array_merge($files, $list);
+        }
+
+        return $files;
     }
 }

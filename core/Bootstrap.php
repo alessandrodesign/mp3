@@ -125,6 +125,7 @@ class Bootstrap
             'PATH_MIDDLEWARES' => $this->basePath . 'app' . DIRECTORY_SEPARATOR . 'Middlewares' . DIRECTORY_SEPARATOR,
             'PATH_MODElS' => $this->basePath . 'app' . DIRECTORY_SEPARATOR . 'Models' . DIRECTORY_SEPARATOR,
             'PATH_SERVICES' => $this->basePath . 'app' . DIRECTORY_SEPARATOR . 'Services' . DIRECTORY_SEPARATOR,
+            'PATH_PROVIDERS' => $this->basePath . 'app' . DIRECTORY_SEPARATOR . 'Providers' . DIRECTORY_SEPARATOR,
         ];
 
         $this->defaultConstants = array_merge($this->defaultConstants, $paths);
