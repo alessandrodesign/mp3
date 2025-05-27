@@ -4,12 +4,13 @@ namespace Core\Routing;
 
 use Core\App;
 use Core\Contracts\MiddlewareInterface;
+use DI\Container;
+use DI\ContainerBuilder;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use RuntimeException;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -36,11 +37,14 @@ class Router
     private array $routes = [];
     private array $namedRoutes = [];
     private array $globalMiddlewares = [];
-    private ContainerBuilder $container;
+    private Container $container;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(ContainerBuilder $container)
     {
-        $this->container = $container;
+        $this->container = $container->build();
     }
 
     /**

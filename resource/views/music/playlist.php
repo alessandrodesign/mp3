@@ -238,6 +238,9 @@
             const option = document.createElement('option');
             option.value = rate;
             option.textContent = rate + 'x';
+            if (rate === 1) {
+                option.selected = true;
+            }
             playbackRateSelect.appendChild(option);
         });
 
@@ -420,7 +423,7 @@
         document.body.appendChild(lyrics);
         document.body.appendChild(playlistEl);
         document.body.appendChild(playbackRateContainer);
-        document.body.appendChild(addSongBtn);
+        // document.body.appendChild(addSongBtn);
 
         // Inicializar player
         updateUI();

@@ -5,7 +5,7 @@ namespace Core;
 use Core\Routing\Router;
 use Core\Utils\ClassFinder;
 use Core\Utils\Directories;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use DI\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use RuntimeException;
 use Exception;
@@ -27,6 +27,19 @@ class App
     private function __construct()
     {
         $this->container = new ContainerBuilder();
+        $this->container->useAutowiring(true);
+        $this->container->useAttributes(true);
+
+        if (Bootstrap::isProd()) {
+            $cacheDir = PATH_CACHE . 'php-di' . DS . 'container';
+            Directories::validAndCreate($cacheDir);
+            $this->container->enableCompilation($cacheDir);
+            $this->container->enableDefinitionCache();
+            $proxiesDir = PATH_CACHE . 'php-di' . DS . 'proxies';
+            Directories::validAndCreate($proxiesDir);
+            $this->container->writeProxiesToFile(true, $proxiesDir);
+        }
+
         $this->registerServices();
     }
 
@@ -62,8 +75,11 @@ class App
     private function registerServices(): void
     {
         // Registrar Request
-        $this->container->register('request', Request::class)
-            ->setFactory([Request::class, 'createFromGlobals']);
+        $this->container->addDefinitions([
+            Request::class => \DI\factory(function () {
+                return Request::createFromGlobals();
+            })
+        ]);
 
         // Registrar Models automaticamente
         $modelsDir = PATH_MODElS;
@@ -84,9 +100,6 @@ class App
         $controllerClasses = PATH_CONTROLLERS;
         Directories::validAndCreate($controllerClasses);
         $this->registerClassesAutomatically($controllerClasses, CONTROLLERS_NAMESPACE);
-
-        // Compilar container para resolver autowiring
-//        $this->container->compile();
     }
 
     private function registerClassesAutomatically(string $directory, string $baseNamespace): void
@@ -94,12 +107,9 @@ class App
         $classes = ClassFinder::findConcreteClasses($directory, $baseNamespace);
 
         foreach ($classes as $class) {
-            if (!$this->container->has($class)) {
-                $this->container->register($class, $class)
-                    ->setAutowired(true)
-                    ->setPublic(true)
-                    ->setLazy(true);
-            }
+            $this->container->addDefinitions([
+                $class => \DI\autowire($class)
+            ]);
         }
     }
 
@@ -118,7 +128,7 @@ class App
      */
     public function run(): void
     {
-        $request = $this->container->get('request');
+        $request = $this->container->build()->get(Request::class);
 
         $router = new Router($this->container);
 

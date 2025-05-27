@@ -11,24 +11,27 @@ use Exception;
 
 class MusicController extends Controller
 {
-    protected MusicService $musicService;
-    protected AudioStreamService $audioStreamService;
     private string $tokenName = 'X-Player-Token';
     private string $token;
 
-    public function __construct()
+    public function __construct(
+        protected MusicService       $musicService,
+        protected AudioStreamService $audioStreamService
+    )
     {
-        $this->musicService = new MusicService;
-        $this->audioStreamService = new AudioStreamService;
         $this->token = hash_hmac('sha256', 'music_stream', SECRET_KEY);
     }
 
-    #[Route('/player', 'GET', 'music.player')]
-    public function player(Request $request): Response
+    /**
+     * @param Request $request
+     * @param string|null $music
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/player/{music}', 'GET', 'music.player')]
+    public function player(Request $request, ?string $music = null): Response
     {
-        $music = 'e1a3ae0f02d1a7a41fe263a33638e1f8d015461ff62f8318812c41da56819e400c41db9b7d0d6564eb3f5b410c39c652e891cdae87bcfc21d8268eeb7b04ef2a';
         $mimeType = $this->musicService->get($music, true);
-
         return $this->view('music.player', compact('request', 'music', 'mimeType'));
     }
 
@@ -59,12 +62,12 @@ class MusicController extends Controller
 
     /**
      * @param Request $request
-     * @param null $music
+     * @param string|null $music
      * @return Response
      * @throws Exception
      */
     #[Route('/music/listen/{music}', 'GET', 'music.listen')]
-    public function listen(Request $request, $music = null): Response
+    public function listen(Request $request, ?string $music = null): Response
     {
         $playerToken = $request->query->get('token');
 
