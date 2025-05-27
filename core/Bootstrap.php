@@ -6,6 +6,7 @@ use Core\Utils\Directories;
 use Exception;
 use RuntimeException;
 use Symfony\Component\Dotenv\Dotenv;
+use Throwable;
 use Whoops\Handler\PrettyPageHandler;
 use Whoops\Run;
 
@@ -33,7 +34,7 @@ class Bootstrap
 
     /**
      * Construtor privado para evitar instância direta.
-     * @throws Exception
+     * @throws Throwable
      */
     private function __construct()
     {
@@ -53,7 +54,7 @@ class Bootstrap
     public static function getInstance(): self
     {
         if (self::$instance === null) {
-            throw new RuntimeException("Bootstrap not initialized.");
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -76,10 +77,6 @@ class Bootstrap
      */
     public static function run(): self
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-
         return self::getInstance();
     }
 
@@ -360,7 +357,7 @@ class Bootstrap
      * de boot principal do sistema.
      *
      * @return void
-     * @throws Exception
+     * @throws Throwable
      */
     private function startApp(): void
     {

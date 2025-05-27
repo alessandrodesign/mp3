@@ -30,7 +30,8 @@
     "symfony/translation": "^7.2",
     "symfony/http-foundation": "^7.2",
     "symfony/dependency-injection": "^7.2",
-    "doctrine/annotations": "^2.0"
+    "doctrine/annotations": "^2.0",
+    "stichoza/google-translate-php": "^5.3"
   },
   "require-dev": {
     "symfony/var-dumper": "^7.2",

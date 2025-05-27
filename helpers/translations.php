@@ -2,7 +2,6 @@
 
 use App\Services\Translations\I18nService;
 
-
 if (!function_exists('t')) {
     /**
      * Função global para tradução.
@@ -29,5 +28,12 @@ if (!function_exists('t')) {
         } catch (Throwable $exception) {
             return $id;
         }
+    }
+}
+
+if (!function_exists('tf')) {
+    function tf(string $id, ...$parameters): string
+    {
+        return sprintf(t($id), ...$parameters);
     }
 }

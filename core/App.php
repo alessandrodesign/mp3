@@ -11,6 +11,7 @@ use DI\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use RuntimeException;
 use Exception;
+use Throwable;
 
 class App
 {
@@ -144,7 +145,7 @@ class App
     /**
      * Executa o sistema
      *
-     * @throws Exception
+     * @throws Throwable
      */
     public function run(): void
     {

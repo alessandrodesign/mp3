@@ -197,7 +197,7 @@ class Router
                                 if ($this->container->has($paramClass)) {
                                     $args[] = $this->container->get($paramClass);
                                 } else {
-                                    throw new RuntimeException("Dependência {$paramClass} não registrada no container para injeção no método {$methodName} do controller {$controllerClass}");
+                                    throw new RuntimeException("Dependency {$paramClass} not registered in container for injection in method {$methodName} of controller {$controllerClass}");
                                 }
                             }
                         } else {
@@ -207,7 +207,7 @@ class Router
                             } elseif ($param->isDefaultValueAvailable()) {
                                 $args[] = $param->getDefaultValue();
                             } else {
-                                throw new RuntimeException("Parâmetro escalar '{$param->getName()}' no método {$methodName} do controller {$controllerClass} não pode ser resolvido automaticamente e não tem valor padrão.");
+                                throw new RuntimeException("Scalar parameter '{$param->getName()}' in method {$methodName} of controller {$controllerClass} cannot be automatically resolved and has no default value.");
                             }
                         }
                     }
@@ -224,7 +224,7 @@ class Router
                         if ($e->getCode()) {
                             return new Response($e->getMessage(), $e->getCode());
                         }
-                        throw $e;
+                        throw new RuntimeException($e->getMessage());
                     }
                 };
 

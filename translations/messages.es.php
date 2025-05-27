@@ -1,4 +1,6 @@
 <?php
-return [
-    'Bem-vindo' => 'Bienvenido',
-];
+
+return array (
+  'Bem-vindo' => 'Bienvenido',
+  'Conecte-se' => 'Conectar',
+);
