@@ -4,3 +4,13 @@ MODELS_NAMESPACE=App\Models
 SERVICES_NAMESPACE=App\Services
 
 SECRET_KEY=31a7cfe7b68493882f75d20e971a6524c4ecac3383099d087c1b44d6bd167044
+
+# Nível de erros do PHP para log
+# Exemplo: E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT
+# See: https://www.php.net/manual/en/errorfunc.constants.php
+# development (E_ALL)
+PHP_ERROR_LEVEL_DEV=32767
+# testing (E_ALL & ~E_NOTICE)
+PHP_ERROR_LEVEL_TEST=32765
+# production (E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT)
+PHP_ERROR_LEVEL_PROD=32759
