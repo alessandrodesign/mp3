@@ -110,6 +110,9 @@ class Router
         $paramNames = [];
         $regex = preg_replace_callback('/\{(\w+)\}/', function ($matches) use (&$paramNames) {
             $paramNames[] = $matches[1];
+            if ($matches[1] === 'path') {
+                return '(.+)';
+            }
             return '([^\/]+)';
         }, $path);
 
@@ -161,7 +164,7 @@ class Router
 
         foreach ($this->routes[$method] as $route) {
             if (preg_match($route['regex'], $path, $matches)) {
-                array_shift($matches); // Remove o match completo
+                array_shift($matches);
                 $params = [];
                 foreach ($route['paramNames'] as $index => $name) {
                     $params[$name] = $matches[$index];

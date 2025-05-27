@@ -168,6 +168,7 @@ class App
         $this->loadHelpers();
 
         $response = $router->dispatch($request);
+
         $response->send();
     }
 

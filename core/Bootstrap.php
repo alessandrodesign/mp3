@@ -217,16 +217,6 @@ class Bootstrap
         // Define locale para pt_BR (Brasil), pode afetar funções de formatação regional
         setlocale(LC_ALL, 'pt_BR.UTF-8', 'pt_BR', 'portuguese');
 
-        // Define timestamp constante (exemplo, timestamp da inicialização do bootstrap)
-        if (!defined('APP_START_TIMESTAMP')) {
-            define('APP_START_TIMESTAMP', time());
-        }
-
-        // Timestamp da aplicação
-        if (!defined('APP_START_TIMESTAMP')) {
-            define('APP_START_TIMESTAMP', time());
-        }
-
         // Headers básicos de segurança
         if (!defined('SECURE_HEADERS_SET')) {
             define('SECURE_HEADERS_SET', true);

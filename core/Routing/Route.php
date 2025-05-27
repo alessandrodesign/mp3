@@ -19,8 +19,7 @@ class Route
     public string $path;
     public array $methods;
     public ?string $name;
-
-    private const ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'];
+    private const array ALLOWED_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'];
 
     /**
      * Construtor da rota.
