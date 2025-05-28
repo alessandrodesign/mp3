@@ -37,25 +37,21 @@ Este projeto é um framework PHP 8.3 personalizado, focado em flexibilidade, des
 - DTOs para dados validados.
 - Middleware para validação e retorno de erros.
 
-### 7. Templating com Twig
-- Integração com Twig para renderização de views.
-- Serviço dedicado para templates.
-
-### 8. Autenticação e Autorização
+### 7. Autenticação e Autorização
 - JWT para autenticação.
 - Middleware para proteção de rotas.
 - Sistema de roles e permissões.
 
-### 9. Servir Arquivos Estáticos
+### 8. Servir Arquivos Estáticos
 - Controller para servir arquivos com suporte a cache e range requests.
 
-### 10. Gravação e Streaming de Vídeo
+### 9. Gravação e Streaming de Vídeo
 - Frontend para captura de vídeo via webcam.
 - Backend para upload, armazenamento e streaming.
 - Limites de tempo e tamanho.
 - Indicadores de tempo e tamanho durante gravação.
 
-### 11. Chat em Tempo Real com Salas e Privacidade
+### 10. Chat em Tempo Real com Salas e Privacidade
 - Servidor WebSocket com Workerman para sinalização e chat.
 - Salas públicas e privadas.
 - Status de usuários (conectado, desconectado).
