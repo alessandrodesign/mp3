@@ -27,6 +27,7 @@ class Bootstrap
      * @var $instance self|null
      */
     private static ?self $instance = null;
+    private static bool $cli = false;
     private string $basePath;
     private array $defaultConstants = [
         'DS' => DIRECTORY_SEPARATOR,
@@ -232,7 +233,9 @@ class Bootstrap
         ini_set('max_execution_time', '60');
         ini_set('realpath_cache_size', '4096k');
         ini_set('realpath_cache_ttl', '600');
-        ini_set('disable_functions', 'exec,passthru,shell_exec,system');
+        if (!self::isCLI()) {
+            ini_set('disable_functions', 'exec,passthru,shell_exec,system');
+        }
         ini_set('session.gc_maxlifetime', '1440');
         ini_set('session.use_strict_mode', '1');
         ini_set('max_input_vars', '3000');
@@ -337,6 +340,17 @@ class Bootstrap
     public static function isTest(): bool
     {
         return self::environment() === self::ENV_TEST;
+    }
+
+    public static function isCLI(): bool
+    {
+        return self::$cli;
+    }
+
+    public static function runCLI(): void
+    {
+        self::$cli = true;
+        self::getInstance();
     }
 
     /**

@@ -4,7 +4,8 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 try {
-    \Core\Bootstrap::run();
+    \Core\Bootstrap::runCLI();
+
     $application = new \Symfony\Component\Console\Application('NorteDev Framework', '1.0.0');
 
     $commandsDir = __DIR__ . '/../app/Console/Commands';
