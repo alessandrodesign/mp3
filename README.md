@@ -1,124 +1,139 @@
-# Sistema de Gerenciamento de Framework PHP Personalizado
+# NorteDev Framework
 
-Este README resume o desenvolvimento de um framework PHP personalizado, abordando desde a configuração inicial até a implementação de funcionalidades avançadas como internacionalização, roteamento, middleware, injeção de dependência, validação, templating e autenticação.
-
----
-
-## Visão Geral
-
-O projeto consiste na criação de um framework PHP 8.3 focado em desempenho, flexibilidade e extensibilidade. O framework utiliza componentes do Symfony para algumas funcionalidades, mas mantém uma estrutura própria para facilitar a personalização e o aprendizado.
+Este projeto é um framework PHP 8.3 personalizado, focado em flexibilidade, desempenho e extensibilidade, com funcionalidades modernas como roteamento via atributos, middleware, injeção de dependência, internacionalização, autenticação, gravação e streaming de vídeo, chat em tempo real, entre outras.
 
 ---
 
-## Funcionalidades Implementadas
+## Funcionalidades Principais
 
-### 1. Configuração Inicial
+### 1. Estrutura e Configuração Inicial
+- Organização clara de diretórios para código, recursos públicos, templates e traduções.
+- Autoload via Composer.
+- Singleton `App` para gerenciamento central da aplicação.
 
-- **Estrutura de diretórios:** Organização clara para código fonte, arquivos públicos, templates e traduções.
-- **Composer:** Gerenciamento de dependências com `composer.json`.
-- **Autoload:** Carregamento automático de classes.
+### 2. Roteamento
+- Rotas definidas via atributos PHP 8.3.
+- Suporte a múltiplos métodos HTTP.
+- Extração automática de parâmetros de rota.
+- Registro automático de controllers.
 
-### 2. Singleton `App`
+### 3. Middleware
+- Suporte a middlewares globais e específicos.
+- Injeção de dependências em middlewares.
+- Middleware para cache de resposta, validação, autenticação, etc.
 
-- Implementação de um singleton para gerenciar a aplicação.
-- Bootstrap básico para inicializar componentes essenciais.
+### 4. Injeção de Dependência
+- Container para registro e resolução automática de dependências.
+- Registro automático de controllers, middlewares e serviços.
 
-### 3. Roteamento com Atributos
-
-- Definição de rotas usando atributos PHP 8.3.
-- Suporte para múltiplos métodos HTTP (GET, POST, etc.).
-- Conversão de rotas com parâmetros para expressões regulares.
-- Extração de parâmetros da rota para injeção nos controllers.
-
-### 4. Middleware
-
-- Implementação de middlewares para interceptar e processar requisições.
-- Middlewares globais e específicos para rotas.
-- Injeção de dependências nos middlewares.
-
-### 5. Injeção de Dependência
-
-- Uso de um container de injeção de dependência para gerenciar as dependências da aplicação.
-- Registro automático de controllers e middlewares no container.
-- Resolução de dependências nos controllers e middlewares.
-
-### 6. Internacionalização (i18n)
-
+### 5. Internacionalização (i18n)
 - Suporte a múltiplos idiomas.
-- Helpers para tradução de textos.
-- Detecção automática de idioma via headers ou URL.
-- Sistema de gestão de traduções com interface web (opcional).
-- Armazenamento de traduções em arquivos PHP.
-- Adição automática de traduções faltantes.
+- Sistema de tradução com placeholders.
+- Detecção automática de idioma.
+- Helpers para tradução.
 
-### 7. Validação de Requisições
+### 6. Validação de Requisições
+- Validação usando Symfony Validator.
+- DTOs para dados validados.
+- Middleware para validação e retorno de erros.
 
-- Validação de dados de requisição usando Symfony Validator.
-- Criação de Data Transfer Objects (DTOs) para representar os dados validados.
-- Middleware para validar as requisições e retornar erros.
+### 7. Templating com Twig
+- Integração com Twig para renderização de views.
+- Serviço dedicado para templates.
 
-### 8. Templating com Twig
+### 8. Autenticação e Autorização
+- JWT para autenticação.
+- Middleware para proteção de rotas.
+- Sistema de roles e permissões.
 
-- Integração com o motor de templates Twig.
-- Criação de um serviço para renderizar templates.
-- Uso de Twig nos controllers para gerar HTML.
+### 9. Servir Arquivos Estáticos
+- Controller para servir arquivos com suporte a cache e range requests.
 
-### 9. Autenticação e Autorização
+### 10. Gravação e Streaming de Vídeo
+- Frontend para captura de vídeo via webcam.
+- Backend para upload, armazenamento e streaming.
+- Limites de tempo e tamanho.
+- Indicadores de tempo e tamanho durante gravação.
 
-- Autenticação baseada em JWT (JSON Web Tokens).
-- Criação de um serviço para gerar e validar tokens JWT.
-- User provider para gerenciar os dados dos usuários.
-- Middleware para proteger as rotas com autenticação.
-- Sistema de roles e permissões para autorização.
+### 11. Chat em Tempo Real com Salas e Privacidade
+- Servidor WebSocket com Workerman para sinalização e chat.
+- Salas públicas e privadas.
+- Status de usuários (conectado, desconectado).
+- Indicador "usuário está digitando".
+- Comandos CLI para iniciar/parar servidor de sinalização.
 
-### 10. Servindo Arquivos Estáticos
+---
 
-- Controller para servir arquivos estáticos com alta performance.
-- Suporte a cache HTTP (ETag, Last-Modified).
-- Suporte a Range Requests para streaming de vídeo.
+## Estrutura de Pastas Atualizada
 
-### 11. Gravação, Armazenamento e Streaming de Vídeo
+```
+/
+├── app/
+│   ├── Console/Commands/       # Comandos CLI (ex: criação de controllers, models, middlewares, servidor signaling)
+│   ├── Controllers/            # Controllers da aplicação
+│   ├── Middlewares/            # Middlewares
+│   ├── Models/                 # Models Eloquent
+│   ├── Services/               # Serviços (ex: SignalingService)
+│   └── ...
+├── core/                      # Código do framework (routing, DI, contratos, etc)
+├── public/                    # Arquivos públicos (index.php, router.php, assets)
+├── resources/
+│   ├── views/                 # Templates Twig
+│   ├── translations/          # Arquivos de tradução
+│   └── js/                    # Scripts JS (ex: capture.js, watch.js)
+├── storage/
+│   ├── cache/                 # Cache da aplicação
+│   ├── logs/                  # Logs
+│   └── videos/                # Vídeos gravados
+├── vendor/                    # Dependências Composer
+├── composer.json
+├── cli.php                    # Arquivo principal CLI
+├── chat-server.php            # Servidor WebSocket para chat e signaling
+└── README.md
+```
 
-- Frontend para gravar vídeos com a webcam.
-- Backend para receber, armazenar e servir os vídeos.
-- Limite de tempo e tamanho para as gravações.
-- Display de tempo e tamanho durante a gravação.
+---
+
+## Como Rodar
+
+1. Instale dependências:
+
+```bash
+composer install
+```
+
+2. Inicie o servidor WebSocket para chat e signaling:
+
+```bash
+php nortedev signaling:chat
+```
+
+3. Acesse as rotas públicas e privadas de chat:
+
+- Sala pública: `/chat/room/{id}`
+- Sala privada: `/chat/private/{user1}/{user2}`
+
+4. Use os comandos CLI para criar controllers, models, middlewares:
+
+```bash
+php nortedev make:controller NomeController
+php nortedev make:model NomeModel --table=nome_tabela
+php nortedev make:middleware NomeMiddleware
+```
 
 ---
 
 ## Tecnologias Utilizadas
 
 - PHP 8.3
-- Symfony Components (HttpFoundation, Validator, Translation, Mime)
-- Twig
-- FastRoute
-- PHP-DI
-- JavaScript (puro)
-- HTML
-- CSS
+- Symfony Components (Console, HttpFoundation, Validator, Translation, Mime)
+- Illuminate Eloquent ORM
+- Workerman (WebSocket)
+- JavaScript (WebRTC, WebSocket)
+- Composer
 
 ---
 
-## Estrutura do Projeto
+## Contato
 
-```
-/
-├── app/                # Código da aplicação
-│   ├── Controllers/    # Controllers
-│   ├── Middlewares/    # Middlewares
-│   ├── Services/       # Serviços
-│   └── ...
-├── core/               # Código do framework
-│   ├── Routing/        # Roteamento
-│   ├── DependencyInjection/ # Injeção de Dependência
-│   ├── Contracts/      # Interfaces
-│   └── ...
-├── public/             # Arquivos públicos
-│   ├── index.php       # Front controller
-│   └── .htaccess       # Configuração do Apache
-├── templates/          # Templates Twig
-├── translations/       # Arquivos de tradução
-├── vendor/             # Dependências do Composer
-├── composer.json       # Arquivo de configuração do Composer
-└── README.md           # Este arquivo
-```
+Para dúvidas ou contribuições, entre em contato com a equipe NorteDev.
