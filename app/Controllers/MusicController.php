@@ -28,7 +28,7 @@ class MusicController extends Controller
      * @return Response
      * @throws Exception
      */
-    #[Route('/player/{music}', 'GET', 'music.player')]
+    #[Route('/music/player/{music}', 'GET', 'music.player')]
     public function player(Request $request, ?string $music = null): Response
     {
         $mimeType = $this->musicService->get($music, true);
