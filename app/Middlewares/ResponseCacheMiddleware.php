@@ -34,6 +34,7 @@ class ResponseCacheMiddleware implements MiddlewareInterface
 
         if (
             $response->getStatusCode() === 200
+            && isset($accept)
             && (
                 $request->isXmlHttpRequest()
                 || (str_contains($accept, 'application/json'))

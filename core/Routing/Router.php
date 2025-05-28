@@ -262,4 +262,19 @@ class Router
     {
         return $this->namedRoutes[$name] ?? null;
     }
+
+    public function getAllRoutes(): array
+    {
+        $result = [];
+        foreach ($this->routes as $method => $routes) {
+            foreach ($routes as $route) {
+                $result[$method][] = [
+                    'path' => $route['regex'], // ou a rota original se armazenada
+                    'controller' => $route['controller'],
+                    'method' => $route['method'],
+                ];
+            }
+        }
+        return $result;
+    }
 }

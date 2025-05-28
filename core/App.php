@@ -23,6 +23,7 @@ class App
      */
     private static ?self $instance = null;
     private ContainerBuilder $container;
+    private Router $router;
 
     /**
      * Construtor privado para evitar instância direta.
@@ -151,23 +152,23 @@ class App
     {
         $request = $this->container->build()->get(Request::class);
 
-        $router = new Router($this->container);
+        $this->router = new Router($this->container);
 
         // Diretório e namespace base dos controllers
         $controllerClasses = Directories::listClasses(PATH_CONTROLLERS, CONTROLLERS_NAMESPACE);
 
         // Registra todos os controllers encontrados
-        $router->registerControllers($controllerClasses);
+        $this->router->registerControllers($controllerClasses);
 
         // Registrar middlewares globais
-        $router->registerGlobalMiddlewares([
+        $this->router->registerGlobalMiddlewares([
             ResponseCacheMiddleware::class,
             LocaleMiddleware::class,
         ]);
 
         $this->loadHelpers();
 
-        $response = $router->dispatch($request);
+        $response = $this->router->dispatch($request);
 
         $response->send();
     }
@@ -185,11 +186,19 @@ class App
         }
 
         global $container;
-         $container= $this->container->build();
+        $container = $this->container->build();
 
         foreach ($files as $file) {
             if (!file_exists($file)) continue;
             include_once $file;
         }
+    }
+
+    /**
+     * @return Router
+     */
+    public function getRouter(): Router
+    {
+        return $this->router;
     }
 }
