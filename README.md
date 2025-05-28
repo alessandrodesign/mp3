@@ -122,17 +122,3 @@ O projeto consiste na criação de um framework PHP 8.3 focado em desempenho, fl
 ├── composer.json       # Arquivo de configuração do Composer
 └── README.md           # Este arquivo
 ```
-
----
-
-## Próximos Passos
-
-- Implementar testes unitários e de integração.
-- Criar um sistema de logs.
-- Adicionar suporte a banco de dados.
-- Melhorar a segurança da aplicação.
-- Criar uma interface de linha de comando (CLI) para facilitar a gestão do framework.
-
----
-
-Este framework foi desenvolvido com o objetivo de fornecer uma base sólida para a criação de aplicações PHP modernas, com foco em desempenho, flexibilidade e facilidade de uso.
