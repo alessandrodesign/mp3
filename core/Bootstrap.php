@@ -351,6 +351,7 @@ class Bootstrap
      */
     private function startApp(): void
     {
+
         App::start()->run();
     }
 

@@ -1,73 +1,29 @@
 <?php
 // chmod +x cli.php
 
-
-use Core\App;
-use Core\Bootstrap;
-
 require __DIR__ . '/../vendor/autoload.php';
 
-Bootstrap::run();
+try {
+    \Core\Bootstrap::run();
 
-$commands = [
-    'help' => 'Exibe esta ajuda',
-    'route:list' => 'Lista todas as rotas registradas',
-    'cache:clear' => 'Limpa o cache da aplicação',
-];
+    $application = new \Symfony\Component\Console\Application('NorteDev Framework', '1.0.0');
 
-function printHelp(array $commands): void
-{
-    echo "Comandos disponíveis:\n";
-    foreach ($commands as $cmd => $desc) {
-        echo "  $cmd\t$desc\n";
-    }
-}
-
-function listRoutes(): void
-{
-    $app = App::getInstance();
-    $router = $app->getRouter(); // Supondo que tenha método getRouter()
-    $routes = $router->getAllRoutes(); // Método que você deve implementar para retornar rotas
-
-    echo "\nRotas registradas:\n";
-    foreach ($routes as $method => $routesArray) {
-        foreach ($routesArray as $route) {
-            echo sprintf("  [%s] %s -> %s::%s\n", $method, $route['path'], $route['controller'], $route['method']);
-        }
-    }
-}
-
-function clearCache(): void
-{
-    $cacheDir = __DIR__ . '/cache';
-    if (!is_dir($cacheDir)) {
-        echo "Cache não encontrado.\n";
-        return;
-    }
-    $files = glob($cacheDir . '/*');
-    foreach ($files as $file) {
-        if (is_file($file)) {
-            unlink($file);
-        }
-    }
-    echo "Cache limpo.\n";
-}
-
-$argv = $_SERVER['argv'];
-$command = $argv[1] ?? 'help';
-
-switch ($command) {
-    case 'help':
-        printHelp($commands);
-        break;
-    case 'route:list':
-        listRoutes();
-        break;
-    case 'cache:clear':
-        clearCache();
-        break;
-    default:
-        echo "Comando desconhecido: $command\n\n";
-        printHelp($commands);
-        exit(1);
+//    // Diretório onde seus comandos estão localizados
+//    $commandsDir = __DIR__ . '/../app/Console/Commands';
+//
+//    // Carrega todos os arquivos PHP do diretório de comandos
+//    foreach (glob($commandsDir . '/*.php') as $commandFile) {
+//        // Obtém o nome da classe baseado no namespace e nome do arquivo
+//        $className = '\\App\Console\\Commands\\' . basename($commandFile, '.php');
+//
+//        if (class_exists($className)) {
+//            $application->add(new $className());
+//        }
+//    }
+    $application->add(new \App\Console\Commands\CreateControllerCommand());
+    $application->add(new \App\Console\Commands\CreateMiddlewareCommand());
+    $application->add(new \App\Console\Commands\CreateModelCommand());
+    $application->run();
+} catch (Throwable $e) {
+    echo $e->getMessage();
 }

@@ -11,6 +11,6 @@ class WebController
     #[Route('/', 'GET', 'web.index')]
     public function index(Request $request): Response
     {
-        return new Response('Bem-vindo');
+        return new Response();
     }
 }
