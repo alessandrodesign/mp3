@@ -43,21 +43,24 @@ class Database
 
     private function defineConnection(): void
     {
-        $this->capsule = new Capsule;
+        $capsule = new Capsule;
 
-        $this->capsule->addConnection([
+        $capsule->addConnection([
             'driver' => DB_DRIVER,
             'host' => DB_HOST,
             'database' => DB_NAME,
             'username' => DB_USER,
             'password' => DB_PASS,
+            'port' => DB_PORT,
             'charset' => DB_CHARSET,
             'collation' => DB_COLLATION,
             'prefix' => DB_PREFIX,
         ]);
 
-        $this->capsule->setAsGlobal();
-        $this->capsule->bootEloquent();
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
+
+        $this->capsule = $capsule;
     }
 
     public static function Capsule(): Capsule

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class Controller
@@ -33,5 +34,15 @@ abstract class Controller
     protected function fail(string $message = "", int $code = Response::HTTP_BAD_REQUEST)
     {
         throw new Exception($message, $code);
+    }
+
+    protected function success(string $message = "", mixed $data = null, int $code = Response::HTTP_OK): JsonResponse
+    {
+        return new JsonResponse([
+            'message' => $message,
+            'statusCode' => $code,
+            'status' => 'success',
+            'data' => $data
+        ], $code);
     }
 }

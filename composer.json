@@ -17,6 +17,7 @@
     }
   ],
   "require": {
+    "ext-pdo": "*",
     "ext-pcntl": "*",
     "ext-posix": "*",
     "psr/log": "^3.0",
