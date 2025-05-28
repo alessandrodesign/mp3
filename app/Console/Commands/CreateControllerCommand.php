@@ -2,16 +2,19 @@
 
 namespace App\Console\Commands;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    'make:controller',
+    'Cria um novo controller',
+    ['make:controller']
+)]
 class CreateControllerCommand extends Command
 {
-    protected static $defaultName = 'make:controller';
-    protected static $defaultDescription = 'Cria um novo controller';
-
     protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'Nome do controller');

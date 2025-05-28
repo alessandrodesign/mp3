@@ -2,16 +2,19 @@
 
 namespace App\Console\Commands;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(
+    'make:middleware',
+    'Cria um novo middleware',
+    ['make:middleware']
+)]
 class CreateMiddlewareCommand extends Command
 {
-    protected static $defaultName = 'make:middleware';
-    protected static $defaultDescription = 'Cria um novo middleware';
-
     protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'Nome do middleware');

@@ -2,17 +2,20 @@
 
 namespace App\Console\Commands;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+#[AsCommand(
+    'make:model',
+    'Cria um novo model Eloquent',
+    ['make:model']
+)]
 class CreateModelCommand extends Command
 {
-    protected static $defaultName = 'make:model';
-    protected static $defaultDescription = 'Cria um novo model Eloquent';
-
     protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'Nome do model');
