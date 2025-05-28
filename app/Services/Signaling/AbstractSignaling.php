@@ -23,36 +23,62 @@ abstract class AbstractSignaling
      */
     public function stop(): bool
     {
+        if (!file_exists($this->pid)) {
+            return true;
+        }
+
         $kill = false;
 
-        // Verifica se o arquivo PID existe
-        if (file_exists($this->pid)) {
-            $pid = trim(file_get_contents($this->pid));
+        $pid = trim(file_get_contents($this->pid));
 
-            // Garante que o PID seja numérico antes de tentar matar
-            if (ctype_digit($pid)) {
+        if (!ctype_digit($pid)) {
+            return false;
+        }
 
-                // Tenta usar posix_kill se estiver disponível
-                if (function_exists('posix_kill')) {
-                    $kill = posix_kill((int)$pid, SIGKILL);
-                } // Se posix_kill não estiver disponível, usa exec()
-                elseif (function_exists('exec')) {
-                    exec("kill -9 $pid 2>&1", $output, $resultCode);
-                    $kill = $resultCode === 0;
-                } // Último recurso: usa shell_exec()
-                else {
-                    $retorno = shell_exec("kill -9 $pid 2>&1");
-                    $kill = empty($retorno); // Se não houver saída, assumimos que deu certo
-                }
+        if ($this->isWindows()) {
+            $command = "taskkill /F /PID $pid";
+        } else {
+            $this->usePosixKill($pid, $kill);
+            $command = "kill -9 $pid 2>&1";
+        }
 
-                // Se o processo foi finalizado, remove o arquivo .pid
-                if ($kill) {
-                    @unlink($this->pid);
-                }
-            }
+        if (!$kill) {
+            $this->useExec($command, $kill);
+            $this->useShellExec($command, $kill);
+        }
+
+        if ($kill) {
+            @unlink($this->pid);
         }
 
         return $kill;
     }
 
+    protected function isWindows(): bool
+    {
+        return stripos(PHP_OS, 'WIN') === 0;
+    }
+
+    protected function useExec(string $command, bool &$kill = false): void
+    {
+        if (!$kill && function_exists('exec')) {
+            exec($command, $outputLines, $resultCode);
+            $kill = $resultCode === 0;
+        }
+    }
+
+    protected function useShellExec(string $command, bool &$kill = false): void
+    {
+        if (!$kill && function_exists('shell_exec')) {
+            $retorno = shell_exec($command);
+            $kill = empty($retorno);
+        }
+    }
+
+    protected function usePosixKill(int $pid, bool &$kill = false): void
+    {
+        if (!$kill && function_exists('posix_kill')) {
+            $kill = posix_kill($pid, SIGKILL);
+        }
+    }
 }

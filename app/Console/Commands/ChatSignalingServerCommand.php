@@ -10,20 +10,20 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    'signaling:start',
-    'Inicia o servidor de sinalização WebSocket',
-    ['signaling:start']
+    'signaling:chat',
+    'Inicia o servidores de sinalização WebSocket para Chats',
+    ['signaling:chat']
 )]
-class StartSignalingServerCommand extends Command
+class ChatSignalingServerCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         set_time_limit(0);
 
-        $output->writeln('Iniciando servidor de sinalização...');
+        $output->writeln('Iniciando servidores de sinalização...');
 
         $signalingService = new SignalingService(new WorkermanWorker());
-        $signalingService->run();
+        $signalingService->runChat();
 
         return Command::SUCCESS;
     }

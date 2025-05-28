@@ -146,4 +146,16 @@ class VideoController extends Controller
             exit;
         }
     }
+
+    #[Route('/video/capture', 'GET', 'video.capture')]
+    public function capture(Request $request): Response
+    {
+        return $this->view('video.capture', compact('request'));
+    }
+
+    #[Route('/video/watch', 'GET', 'video.capture')]
+    public function watch(Request $request): Response
+    {
+        return $this->view('video.watch', compact('request'));
+    }
 }

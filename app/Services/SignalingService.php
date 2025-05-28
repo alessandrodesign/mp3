@@ -20,6 +20,15 @@ readonly class SignalingService
         $this->signalingService->run();
     }
 
+    public function runChat(): void
+    {
+        $this->signalingService->onConnectChat();
+        $this->signalingService->onMessageChat();
+        $this->signalingService->onCloseChat();
+        $this->signalingService->online();
+        $this->signalingService->run();
+    }
+
     public function stop(): bool
     {
        return $this->signalingService->stop();
