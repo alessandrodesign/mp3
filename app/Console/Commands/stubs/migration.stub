@@ -1,0 +1,17 @@
+<?php
+
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Schema\Blueprint;
+
+return new class
+{
+    public function up()
+    {
+        // Código para criar tabela ou alterar schema
+    }
+
+    public function down()
+    {
+        // Código para desfazer alterações
+    }
+};

@@ -118,6 +118,7 @@ class Bootstrap
             'PATH_STORAGE' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR,
             'PATH_TRANSLATIONS' => $this->basePath . 'translations' . DIRECTORY_SEPARATOR,
             'PATH_HELPERS' => $this->basePath . 'helpers' . DIRECTORY_SEPARATOR,
+            'PATH_MIGRATIONS' => $this->basePath . 'database' . DIRECTORY_SEPARATOR . 'Migrations' . DIRECTORY_SEPARATOR,
             'PATH_MUSIC' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'music' . DIRECTORY_SEPARATOR,
             'PATH_CACHE' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR,
             'PATH_LOG' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR,
