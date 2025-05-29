@@ -133,3 +133,4 @@ php nortedev make:middleware NomeMiddleware
 ## Contato
 
 Para dúvidas ou contribuições, entre em contato com a equipe NorteDev.
+
