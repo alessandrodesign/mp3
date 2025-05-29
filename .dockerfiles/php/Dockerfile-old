@@ -1,0 +1,47 @@
+FROM php:8.3-apache
+
+# Habilita mod_rewrite
+RUN a2enmod rewrite
+
+# Define o DocumentRoot como public
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
+
+# Aplica mudança de DocumentRoot
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+
+# Atualiza apt e instala dependências para extensões e ferramentas
+RUN apt-get update && apt-get install -y \
+    git \
+    perl \
+    libmagickwand-dev --no-install-recommends \
+    libmagickcore-dev --no-install-recommends \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    libxml2-dev \
+    libssl-dev \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala extensões PHP necessárias
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd zip pdo pdo_mysql mbstring xml opcache
+
+# Instala e habilita a extensão Redis
+RUN pecl install redis \
+    && docker-php-ext-enable redis
+
+# Instala e habilita a extensão imagick
+RUN pecl install imagick \
+    && docker-php-ext-enable imagick
+
+# Copia o código da aplicação para o container
+COPY . /var/www/html
+
+# Ajusta permissões (opcional, dependendo do seu setup)
+RUN chown -R www-data:www-data /var/www/html
+
+# Exponha a porta 80
+EXPOSE 80

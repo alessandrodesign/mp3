@@ -3,7 +3,6 @@
 namespace Core;
 
 use Core\Utils\Directories;
-use Exception;
 use RuntimeException;
 use Symfony\Component\Dotenv\Dotenv;
 use Throwable;
@@ -43,6 +42,7 @@ class Bootstrap
         $this->loadEnvironment();
         $this->loadConstants();
         $this->setupDefinitions();
+        $this->setupDatabase();
         $this->startApp();
     }
 
@@ -51,14 +51,18 @@ class Bootstrap
      *
      * @return self
      * @throws RuntimeException
+     * @throws Throwable
      */
     public static function getInstance(): self
     {
-        if (self::$instance === null) {
-            self::$instance = new self();
+        try {
+            if (self::$instance === null) {
+                self::$instance = new self();
+            }
+            return self::$instance;
+        } catch (RuntimeException|Throwable $e) {
+            throw $e;
         }
-
-        return self::$instance;
     }
 
     /**
@@ -75,10 +79,15 @@ class Bootstrap
      * Inicia a aplicação e retorna a instância única.
      *
      * @return self
+     * @throws RuntimeException|Throwable
      */
     public static function run(): self
     {
-        return self::getInstance();
+        try {
+            return self::getInstance();
+        } catch (RuntimeException|Throwable $e) {
+            throw $e;
+        }
     }
 
     /**
@@ -118,6 +127,7 @@ class Bootstrap
             'PATH_STORAGE' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR,
             'PATH_TRANSLATIONS' => $this->basePath . 'translations' . DIRECTORY_SEPARATOR,
             'PATH_HELPERS' => $this->basePath . 'helpers' . DIRECTORY_SEPARATOR,
+            'PATH_MIGRATIONS' => $this->basePath . 'database' . DIRECTORY_SEPARATOR . 'Migrations' . DIRECTORY_SEPARATOR,
             'PATH_MUSIC' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'music' . DIRECTORY_SEPARATOR,
             'PATH_CACHE' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR,
             'PATH_LOG' => $this->basePath . 'storage' . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR,
@@ -261,15 +271,17 @@ class Bootstrap
      *   mas registrá-los em arquivo de log.
      * - Define o nível de relatório de erros ignorando notices, deprecated e strict.
      *
+     * @param Throwable $exception
      * @return void
      */
-    public static function setupExceptions(): void
+    public static function setupExceptions(Throwable $exception): void
     {
         // Ativa Whoops apenas em DEV ou TEST
         if (self::isDev() || self::isTest()) {
             if (class_exists(Run::class) && class_exists(PrettyPageHandler::class)) {
                 $whoops = new Run();
                 $whoops->pushHandler(new PrettyPageHandler());
+                $whoops->handleException($exception);
                 $whoops->register();
             }
         }
@@ -300,6 +312,9 @@ class Bootstrap
 
         error_reporting((int)$logLevel);
 
+        if (self::isProd()) {
+            die('ERRO INTERNO, Estamos em manutenção!');
+        }
     }
 
     /**
@@ -365,8 +380,24 @@ class Bootstrap
      */
     private function startApp(): void
     {
+        try {
+            App::start()->run();
+        } catch (Throwable $exception) {
+            throw $exception;
+        }
+    }
 
-        App::start()->run();
+    /**
+     * @return void
+     * @throws Throwable
+     */
+    private function setupDatabase(): void
+    {
+        try {
+            Database::configure();
+        }catch (Throwable $exception){
+            throw $exception;
+        }
     }
 
 }

@@ -151,108 +151,112 @@ class Router
     /**
      * Despacha a requisição para o controller correto, executando middlewares e injetando parâmetros da rota.
      *
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function dispatch(Request $request): Response
     {
-        $method = $request->getMethod();
-        $path = $request->getPathInfo();
+        try {
+            $method = $request->getMethod();
+            $path = $request->getPathInfo();
 
-        if (!isset($this->routes[$method])) {
-            return new Response('Page not found', 404);
-        }
+            if (!isset($this->routes[$method])) {
+                return new Response('Page not found', 404);
+            }
 
-        foreach ($this->routes[$method] as $route) {
-            if (preg_match($route['regex'], $path, $matches)) {
-                array_shift($matches);
-                $params = [];
-                foreach ($route['paramNames'] as $index => $name) {
-                    $params[$name] = $matches[$index];
-                }
+            foreach ($this->routes[$method] as $route) {
+                if (preg_match($route['regex'], $path, $matches)) {
+                    array_shift($matches);
+                    $params = [];
+                    foreach ($route['paramNames'] as $index => $name) {
+                        $params[$name] = $matches[$index];
+                    }
 
-                $controllerClass = $route['controller'];
-                $methodName = $route['method'];
-                $routeMiddlewares = $route['middlewares'] ?? [];
+                    $controllerClass = $route['controller'];
+                    $methodName = $route['method'];
+                    $routeMiddlewares = $route['middlewares'] ?? [];
 
-                if (!class_exists($controllerClass)) {
-                    return new Response("Controller {$controllerClass} not found", 500);
-                }
-
-                $controllerCallable = function (Request $request) use ($controllerClass, $methodName, $params) {
-
-                    if (!$this->container->has($controllerClass)) {
+                    if (!class_exists($controllerClass)) {
                         return new Response("Controller {$controllerClass} not found", 500);
                     }
 
-                    $controller = $this->container->get($controllerClass);
+                    $controllerCallable = function (Request $request) use ($controllerClass, $methodName, $params) {
 
-                    $refMethod = new ReflectionMethod($controllerClass, $methodName);
-                    $args = [];
-                    foreach ($refMethod->getParameters() as $param) {
-                        $paramType = $param->getType();
+                        if (!$this->container->has($controllerClass)) {
+                            return new Response("Controller {$controllerClass} not found", 500);
+                        }
 
-                        if ($paramType && !$paramType->isBuiltin()) {
-                            $paramClass = $paramType->getName();
+                        $controller = $this->container->get($controllerClass);
 
-                            if ($paramClass === Request::class) {
-                                $args[] = $request;
-                            } else {
-                                if ($this->container->has($paramClass)) {
-                                    $args[] = $this->container->get($paramClass);
+                        $refMethod = new ReflectionMethod($controllerClass, $methodName);
+                        $args = [];
+                        foreach ($refMethod->getParameters() as $param) {
+                            $paramType = $param->getType();
+
+                            if ($paramType && !$paramType->isBuiltin()) {
+                                $paramClass = $paramType->getName();
+
+                                if ($paramClass === Request::class) {
+                                    $args[] = $request;
                                 } else {
-                                    throw new RuntimeException("Dependency {$paramClass} not registered in container for injection in method {$methodName} of controller {$controllerClass}");
+                                    if ($this->container->has($paramClass)) {
+                                        $args[] = $this->container->get($paramClass);
+                                    } else {
+                                        throw new RuntimeException("Dependency {$paramClass} not registered in container for injection in method {$methodName} of controller {$controllerClass}");
+                                    }
+                                }
+                            } else {
+                                // Parâmetro escalar: tenta preencher com parâmetro da rota
+                                if (array_key_exists($param->getName(), $params)) {
+                                    $args[] = $params[$param->getName()];
+                                } elseif ($param->isDefaultValueAvailable()) {
+                                    $args[] = $param->getDefaultValue();
+                                } else {
+                                    throw new RuntimeException("Scalar parameter '{$param->getName()}' in method {$methodName} of controller {$controllerClass} cannot be automatically resolved and has no default value.");
                                 }
                             }
-                        } else {
-                            // Parâmetro escalar: tenta preencher com parâmetro da rota
-                            if (array_key_exists($param->getName(), $params)) {
-                                $args[] = $params[$param->getName()];
-                            } elseif ($param->isDefaultValueAvailable()) {
-                                $args[] = $param->getDefaultValue();
-                            } else {
-                                throw new RuntimeException("Scalar parameter '{$param->getName()}' in method {$methodName} of controller {$controllerClass} cannot be automatically resolved and has no default value.");
+                        }
+
+                        try {
+                            $response = $refMethod->invokeArgs($controller, $args);
+
+                            if ($response instanceof Response) {
+                                return $response;
                             }
+
+                            return new Response($response);
+                        } catch (Throwable $e) {
+                            if ($e->getCode()) {
+                                return new Response($e->getMessage(), $e->getCode());
+                            }
+                            throw $e;
                         }
-                    }
+                    };
 
-                    try {
-                        $response = $refMethod->invokeArgs($controller, $args);
+                    // Combina middlewares globais e da rota
+                    $middlewares = array_merge($this->globalMiddlewares, $routeMiddlewares);
 
-                        if ($response instanceof Response) {
-                            return $response;
-                        }
+                    // Cria a cadeia de middlewares + controller
+                    $middlewareChain = array_reduce(
+                        array_reverse($middlewares),
+                        function ($next, $middlewareClass) {
+                            return function (Request $request) use ($middlewareClass, $next) {
+                                /** @var MiddlewareInterface $middleware */
+                                $middleware = $this->container->get($middlewareClass);
+                                return $middleware->handle($request, $next);
+                            };
+                        },
+                        $controllerCallable
+                    );
 
-                        return new Response($response);
-                    } catch (Throwable $e) {
-                        if ($e->getCode()) {
-                            return new Response($e->getMessage(), $e->getCode());
-                        }
-                        throw new RuntimeException($e->getMessage());
-                    }
-                };
-
-                // Combina middlewares globais e da rota
-                $middlewares = array_merge($this->globalMiddlewares, $routeMiddlewares);
-
-                // Cria a cadeia de middlewares + controller
-                $middlewareChain = array_reduce(
-                    array_reverse($middlewares),
-                    function ($next, $middlewareClass) {
-                        return function (Request $request) use ($middlewareClass, $next) {
-                            /** @var MiddlewareInterface $middleware */
-                            $middleware = $this->container->get($middlewareClass);
-                            return $middleware->handle($request, $next);
-                        };
-                    },
-                    $controllerCallable
-                );
-
-                // Executa a cadeia
-                return $middlewareChain($request);
+                    // Executa a cadeia
+                    return $middlewareChain($request);
+                }
             }
-        }
 
-        return new Response('Page not found', 404);
+            return new Response('Page not found', 404);
+        } catch (Throwable $exception) {
+            throw $exception;
+        }
     }
 
     /**

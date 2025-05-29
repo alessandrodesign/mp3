@@ -2,9 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Models\StreamKey;
+use App\Models\StreamLog;
 use Core\Routing\Route;
 use Core\Utils\Directories;
 use Exception;
+use PDO;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -157,5 +160,83 @@ class VideoController extends Controller
     public function watch(Request $request): Response
     {
         return $this->view('video.watch', compact('request'));
+    }
+
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws Exception
+     */
+    #[Route('/video/live/auth', 'POST', 'video.live.auth')]
+    public function liveAuth(Request $request): Response
+    {
+        try {
+            $pdo = new PDO('mysql:host=mysql;dbname=livestream', 'streamer', 'streamerpass');
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $name = $request->get('name');
+
+            $streamKey = StreamKey::firstWhere([
+                ['stream_key', '=', $name],
+                ['active', '=', 1],
+            ]);
+
+            if ($streamKey) {
+                $streamLog = new StreamLog;
+                $streamLog->stream_key = $streamKey->stream_key;
+                $streamLog->action_name = 'start';
+                $streamLog->source_ip = $request->getClientIp();
+                $streamLog->save();
+
+                return new Response('OK');
+            }
+        } catch (Exception $e) {
+            return $this->fail($e->getMessage(), 400);
+        }
+
+        return $this->fail('Forbidden', 403);
+    }
+
+    #[Route('/video/live/painel', 'GET', 'video.live.painel')]
+    public function painel(Request $request): Response
+    {
+        $chaves = StreamKey::all()->toArray();
+        return $this->view('video.live.painel', compact('request', 'chaves'));
+    }
+
+    #[Route('/video/live/revogar', 'GET', 'video.live.revogar')]
+    public function revogar(Request $request): Response
+    {
+        $id = $request->get('id', 0);
+        $streamKey = StreamKey::find($id);
+        $streamKey->active = 0;
+        $streamKey->save();
+        return $this->success("Revogado", $streamKey);
+    }
+
+    #[Route('/video/live/publish', 'GET', 'video.live.publish')]
+    public function publish(Request $request): Response
+    {
+        return $this->view('video.live.publish', compact('request'));
+    }
+
+    #[Route('/video/live/watch', 'GET', 'video.live.watch')]
+    public function liveWatch(Request $request): Response
+    {
+        return $this->view('video.live.watch', compact('request'));
+    }
+
+    #[Route('/video/live/upload', 'GET', 'video.live.upload')]
+    public function liveUpload(Request $request): Response
+    {
+        $targetDir = '/tmp/record/';
+        $targetFile = $targetDir . basename($_FILES['video']['name']);
+
+        if (move_uploaded_file($_FILES['video']['tmp_name'], $targetFile)) {
+            echo "Upload feito com sucesso.";
+        } else {
+            echo "Erro no upload.";
+        }
+
     }
 }

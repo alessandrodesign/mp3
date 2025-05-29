@@ -150,27 +150,31 @@ class App
      */
     public function run(): void
     {
-        $request = $this->container->build()->get(Request::class);
+        try {
+            $request = $this->container->build()->get(Request::class);
 
-        $this->router = new Router($this->container);
+            $this->router = new Router($this->container);
 
-        // Diretório e namespace base dos controllers
-        $controllerClasses = Directories::listClasses(PATH_CONTROLLERS, CONTROLLERS_NAMESPACE);
+            // Diretório e namespace base dos controllers
+            $controllerClasses = Directories::listClasses(PATH_CONTROLLERS, CONTROLLERS_NAMESPACE);
 
-        // Registra todos os controllers encontrados
-        $this->router->registerControllers($controllerClasses);
+            // Registra todos os controllers encontrados
+            $this->router->registerControllers($controllerClasses);
 
-        // Registrar middlewares globais
-        $this->router->registerGlobalMiddlewares([
-            ResponseCacheMiddleware::class,
-            LocaleMiddleware::class,
-        ]);
+            // Registrar middlewares globais
+            $this->router->registerGlobalMiddlewares([
+                ResponseCacheMiddleware::class,
+                LocaleMiddleware::class,
+            ]);
 
-        $this->loadHelpers();
+            $this->loadHelpers();
 
-        $response = $this->router->dispatch($request);
+            $response = $this->router->dispatch($request);
 
-        $response->send();
+            $response->send();
+        } catch (Throwable $e) {
+            throw $e;
+        }
     }
 
     /**
